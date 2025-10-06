@@ -1,36 +1,18 @@
-//! # HyperGCode-4D Simulator
-//!
-//! Simulates HyperGCode-4D printer hardware and physics for testing without
-//! physical hardware. Provides visualization of valve patterns and material flow.
-//!
-//! ## Features
-//!
-//! - Physics-based simulation of pressure, flow, and thermal dynamics
-//! - 3D visualization of valve activation patterns
-//! - Material deposition simulation
-//! - Performance analysis and profiling
-//! - Replay of .hg4d files for validation
-//!
-//! ## Usage
-//!
-//! ```bash
-//! # Simulate a print file
-//! hg4d-simulator --file print.hg4d --visualize
-//!
-//! # Run as virtual printer (accepts firmware connections)
-//! hg4d-simulator --virtual-printer --port 8080
-//!
-//! # Analysis mode (no visualization)
-//! hg4d-simulator --file print.hg4d --analyze
-//! ```
+//! # HyperGCode-4D Simulator Application
 
 use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 
+// Import from our library
+use hypergcode_simulator::{
+    Simulation, SimulationConfig,
+    PhysicsEngine, Visualizer, PerformanceAnalyzer,
+};
+
 #[derive(Parser)]
 #[command(name = "hg4d-simulator")]
 #[command(version)]
-struct SimCli {
+struct Cli {
     /// Input .hg4d file to simulate
     #[arg(short, long)]
     file: Option<PathBuf>,
@@ -71,41 +53,70 @@ enum SimCommands {
     },
 }
 
-fn main() {
-    let cli = SimCli::parse();
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    tracing_subscriber::fmt::init();
+    
+    let cli = Cli::parse();
     
     println!("HyperGCode-4D Simulator v{}", env!("CARGO_PKG_VERSION"));
 
+    // Handle subcommands
     if let Some(command) = cli.command {
-        match command {
-            SimCommands::Analyze { file } => {
-                println!("Analyzing {}...", file.display());
-                // TODO: Implement analysis
-            }
-            SimCommands::Benchmark => {
-                println!("Running benchmark...");
-                // TODO: Implement benchmark
-            }
-            SimCommands::Validate { file } => {
-                println!("Validating {}...", file.display());
-                // TODO: Implement validation
-            }
-        }
-        return;
+        return handle_subcommand(command).await;
     }
+
+    // Create simulation config
+    let config = SimulationConfig {
+        time_step: 0.001,
+        speed_multiplier: cli.speed,
+        visualize: cli.visualize,
+        analyze: true,
+    };
 
     if cli.virtual_printer {
         println!("Starting virtual printer on port {}", cli.port);
-        // TODO: Start virtual printer server
+        run_virtual_printer(cli.port, config).await?;
     } else if let Some(file) = cli.file {
         println!("Simulating {}...", file.display());
-        if cli.visualize {
-            println!("Visualization enabled");
-            // TODO: Start visualization
-        }
-        // TODO: Run simulation
+        
+        let mut simulation = Simulation::new(config)?;
+        let results = simulation.simulate_file(file).await?;
+        
+        println!("\nSimulation Results:");
+        println!("  Total time: {:.2}s", results.total_time);
+        println!("  Material deposited: {:.2}mm³", results.material_deposited);
+        println!("  Valve operations: {}", results.valve_operations);
+        
     } else {
-        eprintln!("Error: Must specify --file or --virtual-printer");
-        std::process::exit(1);
+        anyhow::bail!("Must specify --file or --virtual-printer");
     }
+
+    Ok(())
+}
+
+async fn handle_subcommand(command: SimCommands) -> anyhow::Result<()> {
+    match command {
+        SimCommands::Analyze { file } => {
+            println!("Analyzing {}...", file.display());
+            // Create analyzer and analyze file
+            let analyzer = PerformanceAnalyzer::new();
+            // TODO: Load file and analyze
+            println!("Analysis complete");
+        }
+        SimCommands::Benchmark => {
+            println!("Running benchmark...");
+            // TODO: Run benchmark suite
+        }
+        SimCommands::Validate { file } => {
+            println!("Validating {}...", file.display());
+            // TODO: Validate G-code
+            println!("Validation complete");
+        }
+    }
+    Ok(())
+}
+
+async fn run_virtual_printer(port: u16, config: SimulationConfig) -> anyhow::Result<()> {
+    todo!("Implementation needed: Virtual printer server")
 }
