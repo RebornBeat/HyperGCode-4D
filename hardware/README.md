@@ -8,6 +8,52 @@ The HyperGCode-4D hardware architecture differs fundamentally from traditional 3
 
 This shift in priorities influences every aspect of the mechanical design. The frame must be extraordinarily rigid to support the valve plane without deflection. The Z-axis mechanism must lift substantial weight smoothly and precisely. The material delivery system must maintain pressure and flow to many points simultaneously. The electronics must coordinate operations across far more control channels than traditional printers require.
 
+### Configuration Flexibility and Research Orientation
+
+The specifications presented in this repository represent **design frameworks** rather than rigid prescriptions. HyperGCode-4D remains an emerging technology where fundamental questions about optimal valve densities, routing topologies, actuation mechanisms, and control strategies are still being explored through research and experimentation.
+
+Valve configurations are deliberately described as flexible parameters. A node might contain 4 valves for basic directional routing, 6 valves for more sophisticated flow patterns, 8 valves to separate multiple material channels, or entirely different arrangements discovered through empirical testing. The interconnected nature of the valve network means the optimal topology depends on numerous factors including material viscosity, desired print speed, build volume, thermal management capabilities, and fabrication constraints.
+
+Similarly, grid spacing represents a trade-off between resolution and system complexity. Tighter spacing (0.25mm) enables finer detail but requires more valves, more complex control electronics, and more challenging pressure management. Coarser spacing (1.0mm) simplifies fabrication and control while still demonstrating the fundamental parallel deposition concept. The choice depends on application requirements and available resources.
+
+The models described here—Mini, Standard, Pro, Industrial, and Maker/DIY—illustrate points across the feasibility spectrum rather than discrete product tiers. Builders are encouraged to adapt these frameworks to their specific needs, fabrication capabilities, and research objectives. A maker might build something between the DIY and Mini specifications. A research lab might combine aspects of the Pro architecture with custom valve technologies under investigation. The open design philosophy intentionally supports this experimentation and adaptation.
+
+### Valve Plane Architecture: Single Integrated Layer
+
+A critical aspect often misunderstood is the valve plane's physical structure. The valve plane is **not** multiple stacked layers of print heads. Rather, it's a **single integrated layer** containing all valve nodes in one compact, interconnected assembly that moves as a unit along the Z-axis.
+
+Think of the valve plane like an integrated circuit chip rather than a stack of separate boards. Within this single assembly, material distribution channels, valve actuation chambers, thermal management elements, and control interfaces are all integrated into a unified structure. The valve nodes at different X,Y positions exist side-by-side in the same plane, connected through internal routing channels, not stacked vertically.
+
+This integration provides several advantages. Material can flow between adjacent nodes through short, direct paths rather than requiring vertical routing between layers. The thermal management system heats the entire plane uniformly since all valves exist at the same Z-height. Control signals reach all nodes with minimal latency since the electronic interconnections are short and direct. The mechanical assembly is simpler and more rigid than stacked layers would be.
+
+The interconnected, compact nature of the valve plane means it appears from the outside as a single unified component approximately the thickness of a traditional 3D printer build plate but much more functionally dense. The internal structure with its thousands of valves, channels, and actuators remains largely hidden, visible primarily through the injection points where material enters and the deposition surface where material exits.
+
+### Design Approaches and Prior Art Integration
+
+The HyperGCode-4D concept builds upon and extends several research directions in parallel deposition. Understanding these relationships helps position design choices within the broader landscape.
+
+**Fluid micro-reservoir arrays** demonstrated the viability of segmenting a large print head into many small, independently controlled reservoir-nozzle units. This work addressed pressure stabilization challenges and showed that high valve counts are mechanically feasible. HyperGCode-4D extends this by adding inter-node routing, transforming discrete reservoirs into a networked distribution system where material can flow between nodes according to valve states.
+
+**Multi-material multinozzle systems** like the Wyss Institute's MM3D proved high-frequency material switching and voxel-level control across multiple nozzles simultaneously. This work validated that electronic control systems can coordinate many parallel deposition points with sufficient precision for quality output. HyperGCode-4D scales this coordination to entire planes rather than small nozzle arrays and encodes the coordination in the G-code itself rather than relying solely on real-time motion planning.
+
+**Commercial multi-nozzle implementations** like LIQTRA demonstrate market readiness for parallel approaches and provide practical engineering solutions for synchronizing multiple extruders. These systems prove reliability is achievable and establish baseline performance expectations. HyperGCode-4D goes further by eliminating nozzle movement entirely, trading kinematic complexity for topological routing complexity.
+
+**ORNL multiplexed nozzle concepts** explored shared-extruder architectures where multiple output points draw from common material sources. This work directly informs HyperGCode-4D's material distribution strategy where a few extruders feed many valve nodes through routing networks. The key difference is HyperGCode-4D makes the routing programmable through valve states rather than fixed by plumbing.
+
+**Microfluidic valve arrays** particularly Quake-style pneumatic valves and 3D-printed microvalve matrices, provide the fundamental valve technology that makes fabricated valve planes practical. By adapting these microfluidic principles to larger channel diameters suitable for thermoplastic extrusion, the Maker/DIY Edition brings costs down by orders of magnitude. This democratizes access to parallel deposition technology, enabling widespread experimentation and rapid iteration.
+
+Each of these research directions solved part of the parallel deposition puzzle. HyperGCode-4D integrates these insights into a coherent architecture that addresses the full system: valve grid topology, material routing, control coordination, and G-code representation.
+
+## Model Lineup
+
+The hardware designs include multiple models optimized for different use cases, scales, and budgets. These models share common architectural principles but differ in scale, capabilities, and target applications. Each specification should be understood as a flexible framework adaptable to specific requirements rather than a fixed prescription.
+
+### Configuration Spectrum
+
+The models span a spectrum from affordable DIY proof-of-concept builds to production-capable industrial systems:
+
+**Maker/DIY Edition** uses fabrication instead of purchasing commercial valves, reducing costs by 99% while providing a fully functional platform for research and learning. Grid spacing is coarser (1mm), build volume is modest (50mm × 50mm), but the fundamental parallel deposition concept is completely validated. This edition is ideal for individuals, educational institutions, and early-stage research programs exploring the technology.
+
 ## Model Lineup
 
 The hardware designs include four distinct models, each optimized for different use cases and requirements. These models share common architectural principles but differ in scale, capabilities, and target applications.
